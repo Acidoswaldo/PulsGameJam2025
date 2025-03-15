@@ -6,6 +6,7 @@ using UnityEditor.Callbacks;
 using System.Data.Common;
 using Unity.Mathematics;
 using System;
+using Sirenix.OdinInspector;
 
 public class BoxMove : MovementBase
 {
@@ -23,6 +24,9 @@ public class BoxMove : MovementBase
     [SerializeField, Range(0f, 30f)] private float _EquipForce = 5f;
     bool canMove = false;
     bool isLerping = false;
+    public HashSet<Collider> safeZones = new HashSet<Collider>();
+    [SerializeField] Transform _CurrentCheckpoint;
+
 
     void Awake()
     {
@@ -42,7 +46,7 @@ public class BoxMove : MovementBase
         Debug.DrawRay(transform.position, direction * rayDistance, Color.red, 0.1f);
 
         // Check if there's anything blocking the movement
-        if (Physics.Raycast(ray, out hit, rayDistance))
+        if (Physics.Raycast(ray, out hit, rayDistance, wallLayer))
         {
             // If we hit something that's not a trigger, movement is blocked
             if (!hit.collider.isTrigger)
@@ -78,14 +82,14 @@ public class BoxMove : MovementBase
         }
 
         // Check if movement is possible before attempting to move
-        // if (CanMoveInDirection(moveDirection))
-        // {
+        if (CanMoveInDirection(moveDirection))
+        {
             Assemble(moveDirection);
-        // }
-        // else
-        // {
-        //     halfAssemble(moveDirection);
-        // }
+        }
+        else
+        {
+            halfAssemble(moveDirection);
+        }
     }
 
     private void halfAssemble(Vector3 dir)
@@ -161,14 +165,12 @@ public class BoxMove : MovementBase
 
     public override void Equip(PlayerController playerController)
     {
-
         canMove = false;
         _collider.enabled = true;
         _rb.isKinematic = false;
         _rb.useGravity = true;
         playerController.transform.SetParent(null);
         StartCoroutine(EquipRoutine());
-
     }
 
     IEnumerator EquipRoutine()
@@ -222,6 +224,7 @@ public class BoxMove : MovementBase
 
         isLerping = false;
         canMove = true;
+
     }
 
     private Quaternion GetClosestRightAngleRotation(Quaternion currentRotation)
@@ -238,16 +241,27 @@ public class BoxMove : MovementBase
     {
         if (collision.gameObject.layer == LayerMask.NameToLayer("Ground"))
         {
+            if (!CheckIfInSafeZone())
+            {
+                if (_CurrentCheckpoint != null) transform.position = _CurrentCheckpoint.position;
+            }
             _collider.enabled = false;
             _rb.isKinematic = true;
             _rb.useGravity = false;
             if (!isLerping) StartCoroutine(LerpTransform());
         }
-        if (collision.gameObject.tag == "Edge")
-        {
 
+        bool CheckIfInSafeZone()
+        {
+            Collider[] overlappingColliders = Physics.OverlapSphere(transform.position, 0.1f);
+            foreach (Collider col in overlappingColliders)
+            {
+                if (col.isTrigger && col.gameObject.layer == LayerMask.NameToLayer("Safe"))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
     }
-
-
 }

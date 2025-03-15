@@ -1,11 +1,8 @@
 using UnityEngine;
 using Sirenix.OdinInspector;
-using UnityEngine.PlayerLoop;
 
 public class LegsMove : MovementBase
 {
-
-
     [SerializeField] private Rigidbody _rb;
     [SerializeField] private float _speed = 5;
     [SerializeField] private float _turnSpeed = 360;
@@ -83,6 +80,7 @@ public class LegsMove : MovementBase
     {
         m_playerController.SetDefaultMover();
         transform.position = _startPosition;
+        _rb.linearVelocity = Vector3.zero;
         action.Reset();
     }
 
