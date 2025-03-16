@@ -1,6 +1,7 @@
 using UnityEngine;
 using Sirenix.OdinInspector;
 using UnityEngine.Tilemaps;
+using System.Collections;
 
 public class JumpAction : PartAction
 {
@@ -13,6 +14,9 @@ public class JumpAction : PartAction
     [SerializeField, ReadOnly] private bool _isGrounded;
     [SerializeField] float cooldown = 1f;
     float jumpCooldown = 1f;
+    [SerializeField] Animator animator;
+    [SerializeField] float waitTime;
+
 
     void Start()
     {
@@ -34,8 +38,16 @@ public class JumpAction : PartAction
             _rigidbody.AddForce(Vector2.up * _jumpForce, ForceMode.Impulse);
             Uses--;
             jumpCooldown = cooldown;
+            if(animator != null)
+            {
+                animator.SetTrigger("Jump");
+            }
         }
         return Uses;
+    }
+
+    public override IEnumerator ExecuteCoroutine(){
+        yield return new WaitForSeconds(waitTime);
     }
     private bool CheckGrounded()
     {

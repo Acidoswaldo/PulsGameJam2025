@@ -127,6 +127,7 @@ public class BoxMove : MovementBase
             yield return new WaitForSeconds(0.01f);
         }
         // Perform raycast after rolling is complete
+        SideCheck();
         DownwardRay();
 
         SetParticlePosition();
@@ -141,6 +142,20 @@ public class BoxMove : MovementBase
         stepPartices.transform.position = sides[(int)_currentDownSide].position;
     }
 
+ private void SideCheck()
+    {
+        RaycastHit[] hits = Physics.RaycastAll(transform.position, Vector3.down, 1f);
+        foreach (RaycastHit hit in hits)
+        {
+            // Check for Side script
+            var sideScript = hit.collider.GetComponent<Side>();
+            if (sideScript != null)
+            {
+                // Add any additional logic you need with the side information
+                _currentDownSide = sideScript.side;
+            }
+        }
+    }
     private void DownwardRay()
     {
         RaycastHit[] hits = Physics.RaycastAll(transform.position, Vector3.down, 1f);
@@ -151,14 +166,6 @@ public class BoxMove : MovementBase
             if (trigger != null)
             {
                 trigger.OnCubeSideLanded(_currentDownSide, _playerController);
-            }
-
-            // Check for Side script
-            var sideScript = hit.collider.GetComponent<Side>();
-            if (sideScript != null)
-            {
-                // Add any additional logic you need with the side information
-                _currentDownSide = sideScript.side;
             }
         }
     }
@@ -186,7 +193,10 @@ public class BoxMove : MovementBase
 
     public override void Unequip()
     {
-
+        canMove = false;
+        _collider.enabled = false;
+        _rb.isKinematic = true;
+        _rb.useGravity = false;
     }
 
     private IEnumerator LerpTransform()

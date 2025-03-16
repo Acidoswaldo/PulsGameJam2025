@@ -536,6 +536,7 @@ MonoBehaviour:
   _rb: {fileID: 1987726913443111732}
   _collider: {fileID: 5656413959027693688}
   _EquipForce: 30
+  _CurrentCheckpoint: {fileID: 0}
 --- !u!114 &5554391393006711981
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1307,7 +1308,7 @@ SkinnedMeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -2816575871155357938, guid: c88408e8d0b0e4893ba7372acbf3e36d, type: 3}
+  - {fileID: 2100000, guid: 94b09b63345c9c346a1da9e8b87bd6b9, type: 2}
   - {fileID: -2274090305892019849, guid: c88408e8d0b0e4893ba7372acbf3e36d, type: 3}
   m_StaticBatchInfo:
     firstSubMesh: 0

@@ -31,6 +31,7 @@ public class PlayerController : MonoBehaviour
 
     public void SetMover(MovementBase mover)
     {
+        this.mover.Unequip();
         this.mover = mover;
         mover.Equip(this);
     }
